@@ -1,0 +1,475 @@
+TypeSheet:
+  Header:
+    TypeSystem: Book
+    language: German
+    authority: Book
+    comments: |
+      Book
+      --------------
+      
+      Romana Jezek
+      
+      February 2026
+      
+      This type system defines (a first version of) the structure of
+      the book Universallogik of Wilfried Neumaier
+      die frage ist wie man semantisch die mathcal{L}-Zugehörigkeit erfasst
+  Targets:
+    targets:
+    - sequence: [text,DE,read]
+      vars: [r]
+      comment: read text (German)
+    - sequence: [text,DE,write]
+      vars: [tptp]
+      comment: tptp output
+  StartCategory:
+      book
+  entries:
+    literals: 
+    - productions:
+      - target: r
+        field: ws
+        CRange:
+          - 8-9
+          - 32-32
+      - target: r
+        field: wsx
+        productions: 
+          - alternative:
+            - anyTimes: 
+              - alternative:
+                - link: ws
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: r
+        field: wss
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: ws
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: r
+        field: ampersand
+        CRange:
+          - 38-38
+      - target: r
+        field: dollar
+        CRange:
+          - 36-36
+      - target: r
+        field: textchar
+        CRange:
+          - 1-9
+          - 11-255
+      - target: r
+        field: textchars
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: textchar
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: r
+        field: textchars
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: textchar
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: r
+        field: uletter
+        CRange:
+          - 65-90
+          - 132-132
+          - 150-150
+          - 156-156
+          - 192-222
+        comments: |
+          uppercase latin letter
+      - target: r
+        field: eol
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: lf
+            - match: 
+              - Maximal: 
+                - "&+"
+
+      - target: r
+        field: lf
+        CRange:
+          - 10-10
+      - target: tptp
+        field: textchar
+        CRange:
+          - 1-9
+          - 11-255
+      - target: tptp
+        field: textchars
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: textchar
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: tptp
+        field: textchars
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: textchar
+            - match: 
+              - Maximal: 
+                - "&+"
+      - target: tptp
+        field: uletter
+        CRange:
+          - 65-90
+          - 192-222
+        comments: |
+          uppercase latin letter
+      - target: tptp
+        field: eol
+        productions: 
+          - alternative:
+            - multiple: 
+              - alternative:
+                - link: lf
+            - match: 
+              - Maximal: 
+                - "&+"
+
+      - target: tptp
+        field: lf
+        CRange:
+          - 10-10
+    - productions: 
+      - target: tptp
+        field: litchar
+        input: "&1"
+        output: "&"
+      - target: tptp
+        field: litchar
+        input: "&p"
+        output: ">"
+      - target: tptp
+        field: litchar
+        input: "&i"
+        output: "="
+      - target: tptp
+        field: litchar
+        input: "&e"
+        output: "!"
+    categories: 
+      book:
+        specifications: 
+          OptionalSpec: 
+            theoremRow: theoremRow
+            proof: proof
+        productions: 
+          r:
+            - alternative:
+              - CatVar: theoremRow
+              - optional: 
+                - alternative:
+                  - link: eol
+              - CatVar: proof
+              - optional: 
+                - alternative:
+                  - link: eol
+      theoremRow:
+        specifications: 
+          AllOfSpec: 
+            theorem: theorem
+            theoremName: theoremName
+        productions: 
+          r:
+            - alternative:
+              - link: wsx
+              - link: ampersand
+              - link: wsx
+              - link: theorem
+              - optional: 
+                - alternative:
+                  - link: wsx
+                  - link: eol
+              - link: wsx
+              - link: ampersand
+              - link: wsx
+              - "\\"
+              - "P"
+              - "P"
+              - "{"
+              - CatVar: theoremName
+              - "}"
+          tptp:
+            - alternative:
+              - CatVar: theorem
+              - CatVar: theoremName
+      theorem:
+        specifications: 
+          UnionSpec: 
+            - formulaLink
+      formulaLink:
+        specifications: 
+          AllOfSpec: 
+            formula: formula
+          OptionalSpec: 
+            next: formulaLink
+        productions: 
+          r:
+            - alternative:
+              - CatVar: formula
+              - optional: 
+                - alternative:
+                  - ","
+                  - optional: 
+                    - alternative:
+                      - link: wsx
+                      - link: eol
+                  - link: wsx
+                  - CatVar: next
+          tptp:
+            - alternative:
+              - "("
+              - CatVar: formula
+              - optional: 
+                - alternative:
+                  - "&1"
+                  - CatVar: next
+              - ")"
+      theoremName:
+        specifications: 
+          NothingSpec
+        productions:
+          r:
+            - alternative:
+              - link: textchars
+          tptp:
+            - alternative:
+              - link: textchars
+      formula:
+        specifications: 
+          AllOfSpec: 
+            equality: equality
+        productions: 
+          r:
+            - alternative:
+              - link: dollar
+              - link: wsx
+              - CatVar: equality
+              - link: wsx
+              - link: dollar
+          tptp:
+            - alternative:
+              - CatVar: equality
+      equality:
+        specifications: 
+          AllOfSoec:
+            metaVar1: metaVariable
+            metaVar2: metaVariable
+        productions:
+          r:
+            - alternative:
+              - CatVar: metaVar1
+              - "="
+              - CatVar: metaVar2
+          tptp:
+            - alternative:
+              - CatVar: metaVar1
+              - "="
+              - CatVar: metaVar2
+      metaVariable:
+        specifications:
+          nothingSpec
+        productions:
+          r:
+            - alternative:
+              - "\\"
+              - link: uletter
+          tptp:
+            - alternative:
+              - link: uletter
+      proof:
+        specifications: 
+          OptionalSpec: 
+            name: proofName
+          AllOfSpec: 
+            proofsteps: proofsteps
+        productions: 
+          r:
+            - alternative:
+              - link: wsx
+              - CatVar: name
+              - once: 
+                - alternative:
+                  - ":"
+              - optional: 
+                - alternative:
+                  - link: wsx
+                  - link: eol
+              - link: wsx
+              - CatVar: proofsteps
+              - link: wsx
+              - "\\"
+              - "Q"
+              - "E"
+              - "D"
+          tptp:
+            - alternative:
+              - CatVar: name
+              - CatVar: proofsteps
+      proofName:
+        productions: 
+          r:
+            - alternative:
+              - "\\"
+              - "e"
+              - "m"
+              - "p"
+              - "h"
+              - "{"
+              - link: textchars
+              - "}"
+          tptp:
+            - alternative:
+              - link: textchars
+      proofsteps:
+        specifications: 
+          AllOfSpec: 
+            proofstepLink: proofstepLink
+        productions: 
+          r:
+            - alternative:
+              - CatVar: proofstepLink
+          tptp:
+            - alternative:
+              - "["
+              - CatVar: proofstepLink
+              - "]"
+      proofstepLink:
+        specifications: 
+          AllOfSpec: 
+            proofstep: proofstep
+          OptionalSpec: 
+            next: proofstepLink
+        productions: 
+          r:
+            - alternative:
+              - CatVar: proofstep
+              - optional: 
+                - alternative:
+                  - CatVar: next
+          tptp:
+            - alternative:
+              - CatVar: proofstep
+              - optional: 
+                - alternative:
+                  - ","
+                  - CatVar: next
+      proofstep:
+        specifications: 
+          AllOfSpec: 
+            argument: argument
+            conclusion: formula
+        productions: 
+          r:
+            - alternative:
+              - optional: 
+                - alternative:
+                  - link: wsx
+                  - link: eol
+              - link: wsx
+              - CatVar: argument
+              - optional: 
+                - alternative:
+                  - link: wsx
+                  - link: eol
+              - link: wsx
+              - CatVar: conclusion
+          tptp:
+            - alternative:
+              - "["
+              - CatVar: argument
+              - ","
+              - "\""
+              - CatVar: conclusion
+              - "\""
+              - "]"
+      argument:
+        specifications: 
+          AllOfSpec: 
+            theoremReferenceLink: theoremReferenceLink
+        productions: 
+          r:
+            - alternative:
+              - "\\"
+              - "m"
+              - "i"
+              - "t"
+              - "{"
+              - link: wsx
+              - once: 
+                - alternative:
+                  - CatVar: theoremReferenceLink
+              - "}"
+          tptp:
+            - alternative:
+              - "["
+              - CatVar: theoremReferenceLink
+              - "]"
+      theoremReferenceLink:
+        specifications: 
+          AllOfSpec: 
+            theoremReference: theoremReference
+          OptionalSpec: 
+            next: theoremReferenceLink
+        productions: 
+          r:
+            - alternative:
+              - CatVar: theoremReference
+              - optional: 
+                - alternative:
+                  - once: 
+                    - alternative:
+                      - link: wss
+                  - CatVar: next
+          tptp:
+            - alternative:
+              - "\""
+              - CatVar: theoremReference
+              - "\""
+              - optional: 
+                - alternative:
+                  - ","
+                  - CatVar: next
+      theoremReference:
+        specifications: 
+          AllOfSpec: 
+            name: theoremName
+        productions: 
+          r:
+            - alternative:
+              - "\\"
+              - "T"
+              - "H"
+              - "{"
+              - CatVar: name
+              - "}"
+          tptp:
+            - alternative:
+              - CatVar: name
