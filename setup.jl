@@ -14,10 +14,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
-# You need to have Julia, CMake, Qt5, wget and the g++ compiler to run this setup
-# in Windows you must install wget for Windows or download Dyngenpar and 
-# Vampire manually
+
 
 using Pkg
 

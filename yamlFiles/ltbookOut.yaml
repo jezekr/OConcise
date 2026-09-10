@@ -16,11 +16,11 @@ TypeSheet:
       die frage ist wie man semantisch die mathcal{L}-Zugehörigkeit erfasst
   Targets:
     targets:
-    - sequence: [text,DE,read]
+    - sequence: text.read
       vars: [r]
       comment: read text (German)
-    - sequence: [text,DE,write]
-      vars: [tptp]
+    - sequence: tptp.write
+      vars: [tpw]
       comment: tptp output
   StartCategory:
       book
@@ -110,12 +110,12 @@ TypeSheet:
         field: lf
         CRange:
           - 10-10
-      - target: tptp
+      - target: tpw
         field: textchar
         CRange:
           - 1-9
           - 11-255
-      - target: tptp
+      - target: tpw
         field: textchars
         productions: 
           - alternative:
@@ -125,7 +125,7 @@ TypeSheet:
             - match: 
               - Maximal: 
                 - "&+"
-      - target: tptp
+      - target: tpw
         field: textchars
         productions: 
           - alternative:
@@ -135,14 +135,14 @@ TypeSheet:
             - match: 
               - Maximal: 
                 - "&+"
-      - target: tptp
+      - target: tpw
         field: uletter
         CRange:
           - 65-90
           - 192-222
         comments: |
           uppercase latin letter
-      - target: tptp
+      - target: tpw
         field: eol
         productions: 
           - alternative:
@@ -153,24 +153,24 @@ TypeSheet:
               - Maximal: 
                 - "&+"
 
-      - target: tptp
+      - target: tpw
         field: lf
         CRange:
           - 10-10
     - productions: 
-      - target: tptp
+      - target: tpw
         field: litchar
         input: "&1"
         output: "&"
-      - target: tptp
+      - target: tpw
         field: litchar
         input: "&p"
         output: ">"
-      - target: tptp
+      - target: tpw
         field: litchar
         input: "&i"
         output: "="
-      - target: tptp
+      - target: tpw
         field: litchar
         input: "&e"
         output: "!"
@@ -216,7 +216,7 @@ TypeSheet:
               - "{"
               - CatVar: theoremName
               - "}"
-          tptp:
+          tpw:
             - alternative:
               - CatVar: theorem
               - CatVar: theoremName
@@ -243,7 +243,7 @@ TypeSheet:
                       - link: eol
                   - link: wsx
                   - CatVar: next
-          tptp:
+          tpw:
             - alternative:
               - "("
               - CatVar: formula
@@ -259,7 +259,7 @@ TypeSheet:
           r:
             - alternative:
               - link: textchars
-          tptp:
+          tpw:
             - alternative:
               - link: textchars
       formula:
@@ -274,7 +274,7 @@ TypeSheet:
               - CatVar: equality
               - link: wsx
               - link: dollar
-          tptp:
+          tpw:
             - alternative:
               - CatVar: equality
       equality:
@@ -288,7 +288,7 @@ TypeSheet:
               - CatVar: metaVar1
               - "="
               - CatVar: metaVar2
-          tptp:
+          tpw:
             - alternative:
               - CatVar: metaVar1
               - "="
@@ -301,7 +301,7 @@ TypeSheet:
             - alternative:
               - "\\"
               - link: uletter
-          tptp:
+          tpw:
             - alternative:
               - link: uletter
       proof:
@@ -329,7 +329,7 @@ TypeSheet:
               - "Q"
               - "E"
               - "D"
-          tptp:
+          tpw:
             - alternative:
               - CatVar: name
               - CatVar: proofsteps
@@ -345,7 +345,7 @@ TypeSheet:
               - "{"
               - link: textchars
               - "}"
-          tptp:
+          tpw:
             - alternative:
               - link: textchars
       proofsteps:
@@ -356,7 +356,7 @@ TypeSheet:
           r:
             - alternative:
               - CatVar: proofstepLink
-          tptp:
+          tpw:
             - alternative:
               - "["
               - CatVar: proofstepLink
@@ -374,7 +374,7 @@ TypeSheet:
               - optional: 
                 - alternative:
                   - CatVar: next
-          tptp:
+          tpw:
             - alternative:
               - CatVar: proofstep
               - optional: 
@@ -401,7 +401,7 @@ TypeSheet:
                   - link: eol
               - link: wsx
               - CatVar: conclusion
-          tptp:
+          tpw:
             - alternative:
               - "["
               - CatVar: argument
@@ -427,7 +427,7 @@ TypeSheet:
                 - alternative:
                   - CatVar: theoremReferenceLink
               - "}"
-          tptp:
+          tpw:
             - alternative:
               - "["
               - CatVar: theoremReferenceLink
@@ -448,7 +448,7 @@ TypeSheet:
                     - alternative:
                       - link: wss
                   - CatVar: next
-          tptp:
+          tpw:
             - alternative:
               - "\""
               - CatVar: theoremReference
@@ -470,6 +470,6 @@ TypeSheet:
               - "{"
               - CatVar: name
               - "}"
-          tptp:
+          tpw:
             - alternative:
               - CatVar: name

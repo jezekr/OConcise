@@ -199,7 +199,17 @@ function getCatOutput(data::OrderedDict,formats::Vector{Any},peekNode::String,pr
         if contains(prod,"&")
             #check the escape rules and print the output of the rule
             format = formats[1]
+            chosenTargets = []
             if haskey(format, "TypeSheet") 
+                if haskey(format["TypeSheet"],"Targets")
+                    if haskey(format["TypeSheet"]["Targets"],"targets")
+                        for targetIt in format["TypeSheet"]["Targets"]["targets"]
+                            if haskey(targetIt,"sequence") && targetIt["sequence"] == target
+                                chosenTargets = targetIt["vars"]
+                            end
+                        end
+                    end
+                end
                 if haskey(format["TypeSheet"],"entries")
                     if haskey(format["TypeSheet"]["entries"],"literals")
                         for entry in format["TypeSheet"]["entries"]["literals"]
@@ -210,7 +220,7 @@ function getCatOutput(data::OrderedDict,formats::Vector{Any},peekNode::String,pr
                                         if prod == lit["input"]
                                             if haskey(lit,"target")
                                                 k = lit["target"]
-                                                if k == target
+                                                if k in chosenTargets
                                                     if opt
                                                         push!(optContent,lit["output"])
                                                     else

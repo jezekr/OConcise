@@ -20,7 +20,17 @@ function getProduction(formats::Vector{Any},nodeType::String,target::String)
     production = []
     isLit = false
     format = formats[1]
+    chosenTargets = []
     if haskey(format, "TypeSheet") 
+        if haskey(format["TypeSheet"],"Targets")
+            if haskey(format["TypeSheet"]["Targets"],"targets")
+                for targetIt in format["TypeSheet"]["Targets"]["targets"]
+                    if haskey(targetIt,"sequence") && targetIt["sequence"] == target
+                        chosenTargets = targetIt["vars"]
+                    end
+                end
+            end
+        end                
         if haskey(format["TypeSheet"],"entries")
             if haskey(format["TypeSheet"]["entries"],"literals")
                 for entry in format["TypeSheet"]["entries"]["literals"]
@@ -31,7 +41,7 @@ function getProduction(formats::Vector{Any},nodeType::String,target::String)
                                 if nodeType == lit["field"]
                                     isLit = true
                                     if haskey(lit,"target")
-                                        if lit["target"] == target
+                                        if lit["target"] in chosenTargets
                                             if haskey(lit,"productions")
                                                 production = lit["productions"]
                                                 break
@@ -78,8 +88,10 @@ function getProduction(formats::Vector{Any},nodeType::String,target::String)
                         catInfo = format["TypeSheet"]["entries"]["categories"][nodeType]
                         if haskey(catInfo,"productions")
                             productions = catInfo["productions"]
-                            if haskey(productions,target)
-                                production = productions[target]
+                            for t in chosenTargets
+                                if haskey(productions,t)
+                                     production = productions[t]
+                                end
                             end
                         end
                     end

@@ -26,15 +26,13 @@ using namespace DynGenPar;
 
 struct RuleSetter
 {
-    RuleSetter(const QString &target,const QString &yamlTypesheet) :
-        target(target)
+    RuleSetter(const QString &target,const QString &yamlTypesheet)
     {
         streamedYamlTypesheet = streamTypesheet(yamlTypesheet);
-        QPair rs = setRules();
-        rules = rs.first;
-        startCat = rs.second;
+        setTargetNames(target);
+        setRules();        
     }
-    QPair<RuleSet,Cat> setRules();
+    void setRules();
     void printRulesToYaml(const QString &fileName);
     YAML::Node streamTypesheet(const QString &yamlFileName)
     {
@@ -51,6 +49,7 @@ struct RuleSetter
         }
         return YAML::Node();
     }
+    void setTargetNames(const QString &target);      
     RuleSet rules;
     Cat startCat;
     QStringList categoryNames;
@@ -60,7 +59,7 @@ struct RuleSetter
 private:
     void setCategoryNames();
     Rule getRule(Rule &rule,const QString& catName,QString suffix,YAML::Node prods);
-    QString target;
+    QStringList targetNames;
     YAML::Node streamedYamlTypesheet;
 };
 Q_DECLARE_TYPEINFO(RuleSetter, Q_MOVABLE_TYPE);

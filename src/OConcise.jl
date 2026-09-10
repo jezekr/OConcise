@@ -60,10 +60,11 @@ function readTypesheetsIn(typesheets::Array{String})
     return formats
 end
 
-function checkProofs(data::OrderedDict,formats::Vector{Any},tptpTarget::String)
+function checkProofs(data::OrderedDict,formats::Vector{Any},tptpTarget::String,nodeFunction::Function)
     global stmtList = DataFrame(tptpType = "",name=[],arguments=[],tptp="",output=[])
-    traverseTree(data,formats,tptpTarget,fillStatementList)
+    traverseTree(data,formats,tptpTarget,nodeFunction)
     checkStatements()
+    return stmtList
 end
 
 end

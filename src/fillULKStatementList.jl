@@ -1,5 +1,5 @@
 ######################################################################################
-############################### createStatementList.jl ###############################
+############################### fillULKStatementList.jl ###############################
 ######################################################################################
 #
 # This program saves the theorems and proof steps in tptp format
@@ -15,9 +15,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+using OrderedCollections
+
 global metaVariables = []
 
-function fillStatementList(data::OrderedDict,peekNode::String,transferContent::OrderedDict{String,Any})
+function fillULKStatementList(data::OrderedDict,peekNode::String,transferContent::OrderedDict{String,Any})
     if data[peekNode]["Type"] == "metaVariable"
         push!(metaVariables,join(transferContent[peekNode]["content"]))
     elseif data[peekNode]["Type"] == "theoremRow"

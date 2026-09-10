@@ -64,7 +64,7 @@ void RuleSetter::setCategoryNames()
     YAML::Node imports = streamedYamlTypesheet["TypeSheet"]["Header"]["imports"];
     for (YAML::const_iterator it {imports.begin()}; it != imports.end(); it++)
     {
-        const QString file = QString("../yamlFiles/") + (*it)["TypeSystem"].as<QString>() + QString("Out.yaml");
+        const QString file = QString("yamlFiles/") + (*it)["TypeSystem"].as<QString>() + QString("Out.yaml");
         YAML::Node importStream = streamTypesheet(file);
         QString cat = (*it)["Category"].as<QString>();
         categoryNames << cat;
@@ -76,7 +76,35 @@ void RuleSetter::setCategoryNames()
     }
 }
 
-QPair<RuleSet,Cat> RuleSetter::setRules()
+void RuleSetter::setTargetNames(const QString &target)
+{std::cout << "setargetnames";
+    if (streamedYamlTypesheet["TypeSheet"]["Targets"]["targets"]) 
+    {
+        YAML::Node targetList = streamedYamlTypesheet["TypeSheet"]["Targets"]["targets"];
+        for (YAML::const_iterator targetit = targetList.begin(); targetit != targetList.end(); targetit++)
+        {
+             if ((*targetit)["sequence"]) 
+             {
+                 if ((*targetit)["sequence"].as<QString>() == target)
+                 {
+                     if ((*targetit)["vars"]) 
+                     {
+                         targetNames = (*targetit)["vars"].as<QList<QString>>();
+                         std::cout << targetNames.at(0).toStdString();
+                     } else
+                     {
+                         qFatal("The target does not contain vars!");
+                     }
+                 }
+             } else 
+             {
+                 qFatal("The type sheet does not contain the target name!");
+             }                 
+        }
+    }
+}       
+
+void RuleSetter::setRules()
 {
     QString catName;
     Cat category;
@@ -124,7 +152,7 @@ QPair<RuleSet,Cat> RuleSetter::setRules()
                         assert(prods.IsMap());
                         for (YAML::const_iterator targetit {prods.begin()}; targetit != prods.end(); ++targetit)
                         {
-                            if (target == targetit->first.as<QString>())
+                            if (targetNames.contains(targetit->first.as<QString>()))
                             {
                                 QString suffix = "";
                                 Rule rule;
@@ -206,7 +234,7 @@ QPair<RuleSet,Cat> RuleSetter::setRules()
                         if ((*it)["target"])
                         {
                             QString t {(*it)["target"].as<QString>()};
-                            if (target == t)
+                            if (targetNames.contains(t))
                             {
                                 Rule rule;
                                 QString suffix = "";
@@ -267,7 +295,6 @@ QPair<RuleSet,Cat> RuleSetter::setRules()
             startCat = (Cat) streamedYamlTypesheet["TypeSheet"]["StartCategory"].as<QString>();
         }
     }
-    return qMakePair(rules,startCat);
 }
 
 Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::Node prods)

@@ -15,14 +15,19 @@
 
 
 include("../src/OConcise.jl")
+include("../src/fillULKStatementList.jl")
 using .OConcise
 
-matches = parseFileToJson(ENV["OCONCISE"] * "/texFiles/test.tex", ENV["OCONCISE"] * "/yamlFiles/ltbookOut.yaml","r")
-formats = readTypesheetsIn([ENV["OCONCISE"] * "/yamlFiles/ltbookOut.yaml"])
+texFilePath = ENV["OCONCISE"] * "/texFiles/test.tex"
+typeSheetPath = ENV["OCONCISE"] * "/yamlFiles/ltbookOut.yaml"
+target = "text.read"
+matches = parseFileToJson(texFilePath,typeSheetPath,target)
+formats = readTypesheetsIn([typeSheetPath])
 
 for i in 1:length(matches)
     data = readJsonStringIn(matches[i])
-    checkProofs(data,formats,"tptp")
+    tptpTarget = "tptp.write"
+    stmtList = checkProofs(data,formats,tptpTarget,fillULKStatementList)
     println(stmtList)
 end
 
