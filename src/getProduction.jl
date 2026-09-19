@@ -2,8 +2,6 @@
 ########################### getProduction.jl #######################################
 ####################################################################################
 #
-# this program collects the entries of the category production
-#
 # Copyright (C) 2024-2026 Romana Ježek <office@romanajezek.at>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,6 +12,13 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# this program collects the entries of the category production
+#
+# input: formats - a vector of type sheet paths
+#        nodeType - the tpe sheet category of the node
+#        target - the type sheet target
+# output: production - the grammar entries of the category  
 
 
 function getProduction(formats::Vector{Any},nodeType::String,target::String)

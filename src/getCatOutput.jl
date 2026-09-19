@@ -2,8 +2,6 @@
 ############################ getCatOutput.jl #######################################
 ####################################################################################
 #
-# this program transfers the read category content to the desired output
-#
 # Copyright (C) 2023-2026 Romana Ježek <office@romanajezek.at>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,6 +12,18 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# this program transfers the read category content to the desired output
+#
+# input: data - parse tree
+#        formats - type sheets containing the needed categories
+#        peekNode - the node name
+#        prod - the production of the category
+#        peekChildrenNames -  the node names of the children of the node
+#        transferContent - the content of the nodes collected so far (recursive)
+#        target -  the target name
+# output: transferContent - a dictionary containing node names as keys and
+#               the content of the nodes (output target) as values
 
 global opt = false
 global optContent = []
@@ -39,7 +49,7 @@ function getCatOutput(data::OrderedDict,formats::Vector{Any},peekNode::String,pr
                 cat = data[peekNode]["Type"]
                 stop = false
                 for childName in peekChildrenNames
-                    typed = findTyped(data,childName,[])
+                    typed = findType(data,childName,[])
                     matched = false
                     for typedNode in typed
                         childType = data[typedNode]["Type"]

@@ -2,8 +2,6 @@
 ########################### traverseTree.jl ########################################
 ####################################################################################
 #
-# This program traverses the parse tree
-#
 # Copyright (C) 2023-2026 Romana Ježek <office@romanajezek.at>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,11 +12,27 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# The function traverseTree traverses the parse tree
+#
+# input: data - the parse tree
+#        formats - a vector containg the type sheet with the needed categories
+#        target - the type sheet target
+#        nodeFunction - the name of the function that processes nodes (this can
+#               be a function written by the user
+#
+# The function executeNodeFunction calls the specific node function
+#
+# input: nodeFunction - the function name
+#        data - the parse tree
+#        peekNode - the node name (key of transferContent)
+#        transferContent - the dictionary containing the node names as keys
+#             and the targeted content as values
 
 using OrderedCollections
 
 include("getProduction.jl")
-include("findTyped.jl")
+include("findType.jl")
 include("getCatOutput.jl")
 include("fillULKStatementList.jl")
 
@@ -113,7 +127,7 @@ function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,node
                         transferContent[peekNode]["alternatives"] = OrderedDict()
                         first = true
                         for alternative in peekChildrenNames
-                            typed = findTyped(data,alternative,[])
+                            typed = findType(data,alternative,[])
                             if first
                                 if !(alternative in typed)
                                     transferContent[alternative] = OrderedDict()

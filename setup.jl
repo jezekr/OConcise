@@ -53,21 +53,21 @@ end
 
 if !isfile("$oconcisePath/parser/dyngenpar.cpp")
   if !isfile("$oconcisePath/parser/dyngenpar-12.tar.xz")
-    run(`wget --tries=2 --timeout=200 -nc -P ./parser http://www.tigen.org/kevin.kofler/fmathl/dyngenpar/dyngenpar-12.tar.xz`)
+    run(`wget --tries=2 --timeout=200 -nc -P ./parser https://github.com/Computational-Mathematics-Vienna/FMathL/raw/refs/heads/main/dyngenpar-12.tar.xz`)
   end  
   run(`tar -xf  parser/dyngenpar-12.tar.xz -C ./parser dyngenpar-12/dyngenpar.cpp  --strip-components=1`)
 end
 
 if !isfile("$oconcisePath/parser/dyngenpar.h")
   if !isfile("$oconcisePath/parser/dyngenpar-12.tar.xz")
-    run(`wget --tries=2 --timeout=100 -nc -P ./parser http://www.tigen.org/kevin.kofler/fmathl/dyngenpar/dyngenpar-12.tar.xz`)
+    run(`wget --tries=2 --timeout=100 -nc -P ./parser https://github.com/Computational-Mathematics-Vienna/FMathL/raw/refs/heads/main/dyngenpar-12.tar.xz`)
   end  
   run(`tar -xf  parser/dyngenpar-12.tar.xz -C ./parser dyngenpar-12/dyngenpar.h  --strip-components=1`)
 end
 
 if !isfile("$oconcisePath/parser/priorityqueue.h")
   if !isfile("$oconcisePath/parser/dyngenpar-12.tar.xz")
-    run(`wget --tries=2 --timeout=100 -nc -P ./parser http://www.tigen.org/kevin.kofler/fmathl/dyngenpar/dyngenpar-12.tar.xz`)
+    run(`wget --tries=2 --timeout=100 -nc -P ./parser https://github.com/Computational-Mathematics-Vienna/FMathL/raw/refs/heads/main/dyngenpar-12.tar.xz`)
   end  
   run(`tar -xf  parser/dyngenpar-12.tar.xz -C ./parser dyngenpar-12/priorityqueue.h  --strip-components=1`)
 end

@@ -2,8 +2,6 @@
 ############################# checkStatements.jl###############################
 ###############################################################################
 #
-# This program checks every conjecture in the list with vampire theorem prover
-#
 # Copyright (C) 2026 Romana Ježek <office@romanajezek.at>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,6 +12,12 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# This program checks every conjecture in the data frame stmt
+# with the Vampire theorem prover
+#
+# The output of Vampire will be saved in the column "output"
+# of the data frame.
 
 using DataFrames
 

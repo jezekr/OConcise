@@ -1,8 +1,6 @@
 ######################################################################################
-############################### fillULKStatementList.jl ###############################
+############################### fillULKStatementList.jl ##############################
 ######################################################################################
-#
-# This program saves the theorems and proof steps in tptp format
 #
 # Copyright (C) 2026 Romana Ježek <office@romanajezek.at>
 #
@@ -14,6 +12,18 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# This program converts the theorems and proof steps of the book
+# "Universallogik" (W.Neumaier,2020) into tptp formulas and
+# adds it to the data frame stmt.
+# 
+# input: data - the parsed tree as Julia dictionary
+#        peekNode - the node of the parse tree
+#        transferContent - a dictionary that contains the
+#                  content of the parsed nodes in
+#                  the subtree
+# output: the global data frame stmt will be filled with the tptp
+#               formulas
 
 using OrderedCollections
 

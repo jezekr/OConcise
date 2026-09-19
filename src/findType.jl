@@ -1,9 +1,6 @@
 ####################################################################################
-############################# findTyped.jl #########################################
+############################# findType.jl #########################################
 ####################################################################################
-#
-# This programs traverses the subtree of nodes of type anyTimes, multiple, once or
-# opt to get the original type
 #
 # Copyright (C) 2026 Romana Ježek <office@romanajezek.at>
 #
@@ -15,9 +12,20 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# This programs traverses the subtree of nodes of type anyTimes, multiple, once or
+# opt to get the original type(s).
+# The type names containing "anyTimes", "multiple", "once" or "opt" are added
+# automatically to the grammar with the ruleSetter program.
+#
+# input: data - the parse tree
+#        node - the name of the node containing the type anyTimes, multiple, once
+#               or opt
+#        typed - original node types that are collected so far (recursive)
+# output: typed - the original node type(s)
 
 
-function findTyped(data::OrderedDict,node::String,typed::Array)
+function findType(data::OrderedDict,node::String,typed::Array)
     if !haskey(data,node)
         throw(error(node * "is missing in data"))
     end
@@ -31,12 +39,12 @@ function findTyped(data::OrderedDict,node::String,typed::Array)
         if haskey(data[node],"children")
             children = collect(values(data[node]["children"]))
             for child in children
-                typed = findTyped(data,child,typed)
+                typed = findType(data,child,typed)
             end
         elseif haskey(data[node],"alternatives")
             # TODO take the alternative that is chosen
             alternatives = collect(values(data[node]["alternatives"]))
-            typed = findTyped(data,alternatives[1],typed)
+            typed = findType(data,alternatives[1],typed)
         end
     end
     return typed
