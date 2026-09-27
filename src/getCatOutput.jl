@@ -93,7 +93,7 @@ function getCatOutput(data::OrderedDict,formats::Vector{Any},peekNode::String,pr
                     cat = data[peekNode]["Type"]
                     stop = false
                     for child in peekChildrenNames
-                        typed = findTyped(data,child,[])
+                        typed = findType(data,child,[])
                         for typedNode in typed
                             nType = data[typedNode]["Type"]
                             for format in formats

@@ -15,8 +15,9 @@
 
 
 include("../src/OConcise.jl")
-include("../src/fillULKStatementList.jl")
 using .OConcise
+
+include("../src/fillULKStatementList.jl")
 
 texFilePath = ENV["OCONCISE"] * "/texFiles/test.tex"
 typeSheetPath = ENV["OCONCISE"] * "/yamlFiles/ltbookOut.yaml"

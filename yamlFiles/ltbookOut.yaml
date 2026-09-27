@@ -11,15 +11,13 @@ TypeSheet:
       
       February 2026
       
-      This type system defines (a first version of) the structure of
-      the book Universallogik of Wilfried Neumaier
-      die frage ist wie man semantisch die mathcal{L}-Zugehörigkeit erfasst
+      This is a part of the type sheet for the book "Universallogik" (W. Neumaier,2020).
   Targets:
     targets:
-    - sequence: text.read
+    - sequence: [text.read]
       vars: [r]
       comment: read text (German)
-    - sequence: tptp.write
+    - sequence: [tptp.write]
       vars: [tpw]
       comment: tptp output
   StartCategory:

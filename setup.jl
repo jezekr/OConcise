@@ -28,9 +28,16 @@ juliaPath = Sys.BINDIR
 juliaPrefix = split(Sys.BINDIR,"/bin")[1]
 
 if !isfile("$jllPath/override/libcxxwrap-julia/include/jlcxx/jlcxx.hpp")
-  run(`git clone https://github.com/JuliaInterop/libcxxwrap-julia.git $jllPath/override/libcxxwrap-julia`)
   cd("$jllPath/override")
-  run(`rm -rf "*"`)
+  run(`wget -O libcxxwrap.tar.gz https://github.com/JuliaInterop/libcxxwrap-julia/archive/refs/tags/v0.14.11.tar.gz`)
+  run(`tar -xf libcxxwrap.tar.gz`)
+  if Sys.iswindows()
+    run(`rename libcxxwrap-julia-0.14.11 libcxxwrap-julia`)
+    run(`del /f "*"`)
+  else
+    run(`mv libcxxwrap-julia-0.14.11 libcxxwrap-julia`)
+    run(`rm -rf "*"`)
+  end
   run(`cmake -D Julia_PREFIX=$juliaPrefix $jllPath/override/libcxxwrap-julia`)
   run(`cmake --build . --config Release`)
   cd(oconcisePath)
@@ -38,8 +45,12 @@ end
 
 if !isfile("$oconcisePath/yaml-cpp/include/yaml-cpp/yaml.h")
   #install yaml-cpp
-  run(`git clone https://github.com/jbeder/yaml-cpp.git`)
+  if !isdir("$oconcisePath/yaml-cpp")
+    run(`mkdir yaml-cpp`)
+  end
   cd("yaml-cpp")
+  run(`wget -O yaml-cpp.tar.gz https://github.com/jbeder/yaml-cpp/releases/download/yaml-cpp-0.9.0/yaml-cpp-yaml-cpp-0.9.0.tar.gz`)
+  run(`tar -xf yaml-cpp.tar.gz`)  
   run(`mkdir build`)
   cd("build")
   run(`cmake ..`)
@@ -73,7 +84,11 @@ if !isfile("$oconcisePath/parser/priorityqueue.h")
 end
 
 if isfile("$oconcisePath/parser/dyngenpar-12.tar.xz")
-  run(`rm $oconcisePath/parser/dyngenpar-12.tar.xz`)
+  if Sys.iswindows()
+    run(`del $oconcisePath/parser/dyngenpar-12.tar.xz`)
+  else
+    run(`rm $oconcisePath/parser/dyngenpar-12.tar.xz`)
+  end
 end
 
 if !isfile("$oconcisePath/shared/callParser.so")
@@ -103,7 +118,11 @@ if !isfile("$oconcisePath/vampire/vampire")
       end
   end
   run(`unzip vampire/vampire.zip -d vampire`)
-  run(`rm vampire/vampire.zip`)
+  if Sys.iswindows()
+    run(`del vampire/vampire.zip`)
+  else
+    run(`rm vampire/vampire.zip`)
+  end
 end
 
 # install necessary packages

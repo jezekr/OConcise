@@ -77,32 +77,33 @@ void RuleSetter::setCategoryNames()
 }
 
 void RuleSetter::setTargetNames(const QString &target)
-{std::cout << "setargetnames";
-    if (streamedYamlTypesheet["TypeSheet"]["Targets"]["targets"]) 
+{
+    if (streamedYamlTypesheet["TypeSheet"]["Targets"]["targets"])
     {
         YAML::Node targetList = streamedYamlTypesheet["TypeSheet"]["Targets"]["targets"];
         for (YAML::const_iterator targetit = targetList.begin(); targetit != targetList.end(); targetit++)
         {
-             if ((*targetit)["sequence"]) 
-             {
-                 if ((*targetit)["sequence"].as<QString>() == target)
-                 {
-                     if ((*targetit)["vars"]) 
-                     {
-                         targetNames = (*targetit)["vars"].as<QList<QString>>();
-                         std::cout << targetNames.at(0).toStdString();
-                     } else
-                     {
-                         qFatal("The target does not contain vars!");
-                     }
-                 }
-             } else 
-             {
-                 qFatal("The type sheet does not contain the target name!");
-             }                 
+            if ((*targetit)["sequence"])
+            {
+                if ((*targetit)["sequence"].as<QList<QString>>().contains(target))
+                {
+                    if ((*targetit)["vars"])
+                    {
+                        targetNames = (*targetit)["vars"].as<QList<QString>>();
+                    }
+                    else
+                    {
+                        qFatal("The target does not contain vars!");
+                    }
+                }
+            }
+            else
+            {
+                qFatal("The type sheet does not contain the target name!");
+            }
         }
     }
-}       
+}
 
 void RuleSetter::setRules()
 {
@@ -113,9 +114,9 @@ void RuleSetter::setRules()
     if (streamedYamlTypesheet["TypeSheet"]["entries"]["categories"])
     {
         categories = streamedYamlTypesheet["TypeSheet"]["entries"]["categories"];
-        for (YAML::const_iterator it {categories.begin()}; it != categories.end(); ++it)
+        for (YAML::const_iterator catit {categories.begin()}; catit != categories.end(); catit++)
         {
-            QString catName = it->first.as<QString>();
+            QString catName = catit->first.as<QString>();
             if (catName == "TimesExpression")
             {
                 continue;
@@ -163,7 +164,7 @@ void RuleSetter::setRules()
                 }
                 else
                 {
-                    // if the union is a list and not a map, create for all category a rule and add it to rules
+                    // if the union is a list and not a map, create for every category a rule and add it to rules
                     if (categoryContent["specifications"])
                     {
                         YAML::Node specs = categoryContent["specifications"];
@@ -205,12 +206,12 @@ void RuleSetter::setRules()
             {
                 auto prods = (*litit)["productions"];
                 assert(prods.IsSequence());
-                for (YAML::const_iterator it {prods.begin()}; it != prods.end(); ++it)
+                for (YAML::const_iterator prodit {prods.begin()}; prodit != prods.end(); ++prodit)
                 {
-                    assert((*it).IsMap());
-                    if ((*it)["field"])
+                    assert((*prodit).IsMap());
+                    if ((*prodit)["field"])
                     {
-                        QString litName {((*it)["field"]).as<QString>()};
+                        QString litName {((*prodit)["field"]).as<QString>()};
                         if (litName.isEmpty())
                         {
                             qFatal("literal name is missing");
@@ -231,27 +232,27 @@ void RuleSetter::setRules()
                             qFatal(litName.toLatin1() + " not in categories");
                             continue;
                         }
-                        if ((*it)["target"])
+                        if ((*prodit)["target"])
                         {
-                            QString t {(*it)["target"].as<QString>()};
+                            QString t {(*prodit)["target"].as<QString>()};
                             if (targetNames.contains(t))
                             {
                                 Rule rule;
                                 QString suffix = "";
-                                if ((*it)["productions"])
+                                if ((*prodit)["productions"])
                                 {
-                                    getRule(rule,litName,suffix,(*it)["productions"]);
+                                    getRule(rule,litName,suffix,(*prodit)["productions"]);
                                 }
-                                else if ((*it)["CRange"])
+                                else if ((*prodit)["CRange"])
                                 {
-                                    QList<QString> ranges = (*it)["CRange"].as<QList<QString>>();
+                                    QList<QString> ranges = (*prodit)["CRange"].as<QList<QString>>();
                                     for (int i = 0; i < ranges.size(); i++)
                                     {
                                         QString range {ranges[i]};
                                         QStringList rangeNrs = range.split('-');
                                         if (rangeNrs.size() != 2)
                                         {
-                                            qFatal((*it)["field"].as<QString>().toLatin1() + ": range: " + range.toLatin1() + "is not a range!");
+                                            qFatal((*prodit)["field"].as<QString>().toLatin1() + ": range: " + range.toLatin1() + "is not a range!");
                                         }
                                         else
                                         {
@@ -298,7 +299,7 @@ void RuleSetter::setRules()
 }
 
 Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::Node prods)
-{
+{   
     QString fullName;
     QString matchChar;
     int tabooNr = 0;
@@ -308,17 +309,13 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
     {
         fullName = catName+suffix;
     }
-    else if (suffix.isEmpty())
+    else
     {
         fullName = catName;
     }
-    else
-    {
-        //throw error "suffix neither empty nor not empty"
-    }
     if (!categoryNames.contains(fullName))
     {
-        //throw error fullName + " is not in the list"
+        qFatal("full name is not in the list");
     }
     Cat category;
     if (typeid(Cat) == typeid(int))
@@ -331,12 +328,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
     }
     if (catName.isEmpty())
     {
-        //throw error "there is no category name"
-    }
-    YAML::Node specs;
-    if (streamedYamlTypesheet["TypeSheet"]["entries"]["categories"][catName.toStdString()]["specifications"])
-    {
-        specs = streamedYamlTypesheet["TypeSheet"]["entries"]["categories"][catName.toStdString()]["specifications"];
+        qFatal("there is no category name");
     }
     if (prods.IsNull())
     {
@@ -356,7 +348,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
         {
             if (!categoryNames.contains(prods["input"].as<QString>()))
             {
-                //throw error (prods["input"]).as<QString>() + "is not in the list")
+                qFatal("The input is not listed");
             }
             rule << (Cat) categoryNames.indexOf(prods["input"].as<QString>());
             if (!rule.isEmpty())
@@ -367,7 +359,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
         else if (!(*iter).IsScalar() && (*iter)["alternative"])
         {
             getRule(rule,catName,suffix,(*iter)["alternative"]);
-            if ((*iter)["alternative"][0].IsScalar() || !((*iter)["alternative"][0]["alternative"]))
+            if (((*iter)["alternative"][0].IsScalar() || !((*iter)["alternative"][0]["alternative"])) && !catName.contains("options"))
             {
                 rules[category] << (Rule() << rule);
             }
@@ -382,7 +374,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
             else
             {
                 getRule(rule,catName,suffix,(*iter)["or"]);
-                if ((*iter)["or"][0].IsScalar() || !((*iter)["or"][0]["alternative"]))
+                if (((*iter)["or"][0].IsScalar() || !((*iter)["or"][0]["alternative"])) && !catName.contains("options"))
                 {
                     rules[category] << (Rule() << rule);
                 }
@@ -390,85 +382,132 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
         }
         else if (!(*iter).IsScalar() && (*iter)["CatVar"])
         {
-            if (specs.IsNull())
+            if (catName.contains("options"))
             {
-                //throw error ("Rule "+catName+" contains a category variable but the category has no specifications")
-            }
-            assert(specs.IsMap());
-            if (specs["UnionSpec"])
-            {
-                QString cat;
-                YAML::Node specVals = specs["UnionSpec"];
-                assert(specVals.IsSequence());
-                for (YAML::const_iterator entryit {specVals.begin()}; entryit != specVals.end(); ++entryit)
+                if (categoryNames.contains((*iter)["CatVar"].as<QString>()))
                 {
-                    if ((*entryit).IsMap())
+                    if(typeid(Cat) == typeid(int))
                     {
-                        QString catAlias = entryit->begin()->first.as<QString>();
-                        QString cat = (entryit->begin()->second).as<QString>();
-                        if (((*iter)["CatVar"]).as<QString>() == catAlias)
-                        {
-                            if(typeid(Cat) == typeid(int))
-                            {
-                                rules[category] << (Rule() << (Cat) categoryNames.indexOf(cat));
-                            }
-                            else
-                            {
-                                rules[category] << (Rule() << (Cat) cat);
-                            }
-                        }
+                        rules[category] << (Rule() << (Cat) categoryNames.indexOf((*iter)["CatVar"].as<QString>()));
                     }
                     else
                     {
-                        QString cat = (*entryit).second.as<QString>();
-                        if (!categoryNames.contains(cat))
+                        rules[category] << (Rule() << (Cat) (*iter)["CatVar"].as<QString>());
+                    }
+                }
+                else
+                {
+                    qFatal("The category is not listed in categoryNames!");
+                }
+            }
+            else
+            {   
+                YAML::Node specs;
+                if (streamedYamlTypesheet["TypeSheet"]["entries"]["categories"][catName.toStdString()])
+                {
+                    if (streamedYamlTypesheet["TypeSheet"]["entries"]["categories"][catName.toStdString()]["specifications"])
+                    {
+                         specs = streamedYamlTypesheet["TypeSheet"]["entries"]["categories"][catName.toStdString()]["specifications"];
+                    }
+                }
+                assert(specs.IsMap());
+                if (specs["UnionSpec"])
+                {
+                    QString cat;
+                    YAML::Node specVals = specs["UnionSpec"];
+                    assert(specVals.IsSequence());
+                    for (YAML::const_iterator entryit {specVals.begin()}; entryit != specVals.end(); ++entryit)
+                    {
+                        if ((*entryit).IsMap())
                         {
-                            qFatal(cat.toLatin1() + " is not in the Catlist\n");
-                        }
-                        if(typeid(Cat) == typeid(int))
-                        {
-                            rule << (Cat) categoryNames.indexOf(cat);
+                            QString catAlias = entryit->begin()->first.as<QString>();
+                            cat = (entryit->begin()->second).as<QString>();
+                            if (((*iter)["CatVar"]).as<QString>() == catAlias)
+                            {
+                                if (categoryNames.contains(cat))
+                                {
+                                    if(typeid(Cat) == typeid(int))
+                                    {
+                                        rules[category] << (Rule() << (Cat) categoryNames.indexOf(cat));
+                                    }
+                                    else
+                                    {
+                                        rules[category] << (Rule() << (Cat) cat);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            rule << (Cat) cat;
-                        }
-                    }
-                }
-            }
-            for  (YAML::const_iterator specit {specs.begin()}; specit != specs.end(); ++specit)
-            {
-                if (specit->first.as<QString>() != "UnionSpec")
-                {
-                    QString catVar = (*iter)["CatVar"].as<QString>();
-                    YAML::Node catsAssignement = specit->second;
-                    assert(catsAssignement.IsMap());
-                    QList<Rule> tempRules;
-                    for (YAML::const_iterator entryit {catsAssignement.begin()}; entryit != catsAssignement.end(); ++entryit)
-                    {
-                        QString catAlias = entryit->first.as<QString>();
-                        if (catAlias == catVar)
-                        {
-                            auto assignedCats = entryit->second;
-                            if (assignedCats.IsMap())
+                            QString cat = (*entryit).second.as<QString>();
+                            if (!categoryNames.contains(cat))
                             {
-                                for (YAML::const_iterator catit {assignedCats.begin()}; catit != assignedCats.end(); ++catit)
-                                {
-                                    Rule r;
-                                    r << (*catit).second.as<QString>();
-                                    tempRules << r;
-                                }
+                                qFatal(cat.toLatin1() + " is not in the Catlist\n");
+                            }
+                            if(typeid(Cat) == typeid(int))
+                            {
+                                rule << (Cat) categoryNames.indexOf(cat);
                             }
                             else
                             {
-                                QString cat;
-                                cat = entryit->second.as<QString>();
-                                if (!categoryNames.contains(cat))
+                                rule << (Cat) cat;
+                            }
+                        }
+                    }
+                }
+                assert(specs.IsMap());
+                for  (YAML::const_iterator specit {specs.begin()}; specit != specs.end(); ++specit)
+                {
+                    if (specit->first.as<QString>() != "UnionSpec")
+                    {
+                        QString catVar = (*iter)["CatVar"].as<QString>();
+                        YAML::Node catsAssignement = specit->second;
+                        //assert(catsAssignement.IsMap());
+                        YAML::Node newProds;
+                        for (YAML::const_iterator entryit {catsAssignement.begin()}; entryit != catsAssignement.end(); ++entryit)
+                        {
+                            QString catAlias = entryit->first.as<QString>();
+                            if (catAlias == catVar)
+                            {
+                                auto assignedCats = entryit->second;
+                                if (assignedCats.IsMap())
                                 {
-                                    qFatal(cat.toLatin1() + " is not in the Catlist\n");
+                                    optNr += 1;
+                                    QString newCatName = catName + "options" + QString::number(optNr);
+                                    categoryNames << (newCatName);
+                                    if(typeid(Cat) == typeid(int))
+                                    {
+                                        rule << (Cat) categoryNames.indexOf(newCatName);
+                                    }
+                                    else
+                                    {
+                                        rule << (Cat) (newCatName);
+                                    }
+                                    YAML::Node added1;
+                                    YAML::Node catVar;
+                                    YAML::Node firstMap = entryit->second;
+                                    catVar["CatVar"] = firstMap.begin()->second.as<QString>();
+                                    added1["alternative"].push_back(catVar);
+                                    newProds.push_back(added1);
+                                    for (YAML::const_iterator catit {++firstMap.begin()}; catit != firstMap.end(); ++catit)
+                                    {
+                                        YAML::Node added2;
+                                        YAML::Node catVar;
+                                        catVar["CatVar"] = catit->second.as<QString>();
+                                        added2["or"].push_back(catVar);
+                                        newProds.push_back(added2);
+                                    }
+                                    Rule r;
+                                    getRule(r,newCatName,suffix,newProds);
                                 }
-                                if (tempRules.empty())
+                                else
                                 {
+                                    QString cat;
+                                    cat = entryit->second.as<QString>();
+                                    if (!categoryNames.contains(cat))
+                                    {
+                                        qFatal(cat.toLatin1() + " is not in the Catlist\n");
+                                    }
                                     if(typeid(Cat) == typeid(int))
                                     {
                                         rule << (Cat) categoryNames.indexOf(cat);
@@ -478,29 +517,8 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                                         rule << (Cat) cat;
                                     }
                                 }
-                                else
-                                {
-                                    // since the rules[category] can contain more than one rule we have to add the current cat
-                                    // to every rule of rules[category]
-                                    // TODO: also for other entries, not only catVars!!
-                                    for (int i=0; i < tempRules.size(); ++i)
-                                    {
-                                        if(typeid(Cat) == typeid(int))
-                                        {
-                                            tempRules[i] << (Cat) categoryNames.indexOf(cat);
-                                        }
-                                        else
-                                        {
-                                            tempRules[i] << (Cat) cat;
-                                        }
-                                    }
-                                }
                             }
                         }
-                    }
-                    if (!tempRules.empty())
-                    {
-                        rules[category] = tempRules;
                     }
                 }
             }
@@ -791,12 +809,11 @@ void RuleSetter::printRulesToYaml(const QString &fileName)
     QTextStream output(&file);
     output.setCodec(QTextCodec::codecForName("UTF-8"));
     file.open(QFile::WriteOnly | QFile::Text);
-    assert(!rules.isEmpty());
     for(QHash<Cat, QList<DynGenPar::Rule> >::iterator rit {rules.begin()}; rit != rules.end(); rit++)
     {
         if (categoryNames.size() < rit.key()||rit.key() < 1)
         {
-            // throw error
+            qFatal("the category is not in the categoryNames list");
         }
         output << rit.key() << ":\n";
         int ruleNr = 0;
@@ -814,10 +831,12 @@ void RuleSetter::printRulesToYaml(const QString &fileName)
                 {
                     if (categoryNames.size() < *ruleit || rit.key() < 1)
                     {
-                        //throw error
+                        // TODO: special characters???
+                        continue;
+                        //qFatal("the category is not in the categoryNames list");
                     }
                     output << "    - \"";
-                    output << (*ruleit) << (*ruleit).at(0).unicode();
+                    output << (*ruleit);
                     output << "\"\n";
                 }
             }

@@ -22,8 +22,9 @@
 # sheet
 # input: fileToParse - the file that should be parsed
 #        typeSheet - the corresponding type sheet
-#        target - the target name
-# output: matches - a vector of DynGenPar matches
+#        target - the desired target in the type sheet
+# output: matches - a vector of DynGenPar matches (parse trees) 
+#                   provided as Json strings
 #
 # The function readJsonFileIn transforms the parse tree in
 # json format (saved into a file) into a Julia dictionary
@@ -40,7 +41,7 @@
 #
 # The function readTypeSheetsIn loads the yaml type
 # sheets into Julia dictionaries
-# input: typesheets - array of paths of the yaml type sheets
+# input: typesheets - array of paths of the Yaml type sheets
 # output: Julia dictionaries
 #
 # The function checkProofs traverses the parse tree applying
@@ -57,6 +58,9 @@
 #     * arguments (optional): arguments that are used for
 #       a proof step
 #     * tptp: the axiom, theorem or conjecture as tptp formula
+#     * nodeFunction: the name of the function that is used to process
+#         the nodes. You can add a function for your own specific needs
+#         (see fillULKStatementList.jl).
 # After the tree traversal the function calls the theorem prover
 # Vampire to check the conjectures. The output of Vampire is
 # saved into the column "output".

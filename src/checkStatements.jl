@@ -13,9 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# This program checks every conjecture in the data frame stmt
-# with the Vampire theorem prover
 #
+# This program checks every conjecture in the data frame stmt
+# with the Vampire theorem prover.
 # The output of Vampire will be saved in the column "output"
 # of the data frame.
 

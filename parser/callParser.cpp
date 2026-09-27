@@ -33,11 +33,12 @@ std::vector<std::string> callParser(const std::string &sourceFile,const std::str
     QList<StackItem> stacks;
     QList<Match> matches = parser.parse(&errorPos, &errorToken, 0,&stacks, 0);
     int i = 0;
-    std::cout << matches.size() << "\n";
+    std::cout << "parsed sucessfully: " << (matches.size() > 0) << "\n";
     std::vector<std::string> vec = {};
     for (auto m:matches)
     {
         QString result = parser.printParseTreeToJson(m.tree).join("");
+        std::cout << "json written\n";
         std::string str = result.toStdString();
         vec.push_back(str);
         ++i;

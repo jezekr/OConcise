@@ -13,9 +13,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# This program converts the theorems and proof steps of the book
-# "Universallogik" (W.Neumaier,2020) into tptp formulas and
-# adds it to the data frame stmt.
+# This function processes the parse tree nodes containting the 
+# axioms and proof steps in the book "Universallogik" (W.Neumaier,2020)
+# and converts them into TPTP formulas so that they can be checked with
+# the theorem prover.
 # 
 # input: data - the parsed tree as Julia dictionary
 #        peekNode - the node of the parse tree

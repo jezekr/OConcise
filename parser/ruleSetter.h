@@ -30,7 +30,7 @@ struct RuleSetter
     {
         streamedYamlTypesheet = streamTypesheet(yamlTypesheet);
         setTargetNames(target);
-        setRules();        
+        setRules();       
     }
     void setRules();
     void printRulesToYaml(const QString &fileName);

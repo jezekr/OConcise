@@ -30,7 +30,7 @@ function getProduction(formats::Vector{Any},nodeType::String,target::String)
         if haskey(format["TypeSheet"],"Targets")
             if haskey(format["TypeSheet"]["Targets"],"targets")
                 for targetIt in format["TypeSheet"]["Targets"]["targets"]
-                    if haskey(targetIt,"sequence") && targetIt["sequence"] == target
+                    if haskey(targetIt,"sequence") && target in targetIt["sequence"]
                         chosenTargets = targetIt["vars"]
                     end
                 end
