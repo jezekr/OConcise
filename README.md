@@ -20,7 +20,11 @@ The output should be a data frame containing axioms and proof steps and the answ
 
 ### Where you find what you need:
 The type sheets are stored in the **yamlFiles** directory.  
+<<<<<<< HEAD
 A test file can be found in the **test** directory.  
+=======
+A test file can be found in the **test** directory.
+>>>>>>> 75c666ab766cb00142d739b08e7438097575ae9a
 
 ### Type sheets:
 The grammar of the YAML type sheets is very similar to the original .cnt grammar:
