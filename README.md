@@ -1,5 +1,5 @@
 # OConcise - Semantic analysis of mathematical text
-OConcise is part of the [FMathL project](https://github.com/Computational-Mathematics-Vienna/FMathL). It combines the already existing concept of using grammar sheets for parsing natural mathematical language (see [Concise](https://www.mat.univie.ac.at/~dferi/concise.html)) with the automatic formalization of parsed text and the verification of mathematical proofs. The grammar sheets are called Type Sheets and are written in Yaml format. The original version of Type Sheets (in .cnt format) is described in Kevin Koflers dissertation [Dynamic Gemeral Parsing and Natural Mathematical Language](https://utheses-gateway.univie.ac.at/apiFulltext/document/get/file/43156). A Yaml type sheet is provided here as an example (The grammar will be added soon).
+OConcise is part of the [FMathL project](https://github.com/Computational-Mathematics-Vienna/FMathL). It combines the already existing concept of using grammar sheets for parsing natural mathematical language (see [Concise](https://www.mat.univie.ac.at/~dferi/concise.html)) with the automatic formalization of parsed text and the verification of mathematical proofs. The grammar sheets are called Type Sheets and are written in Yaml format. The original version of Type Sheets (in .cnt format) is described in Kevin Koflers dissertation [Dynamic Gemeral Parsing and Natural Mathematical Language](https://utheses-gateway.univie.ac.at/apiFulltext/document/get/file/43156). A Yaml type sheet is provided here as an example (The grammar will be added soon).  
 The parser [DynGenPar](http://www.tigen.org/kevin.kofler/fmathl/dyngenpar/dyngenpar-12.tar.xz) is used to parse the text with the type sheet grammar. The Type Sheets are automatically converted into the input grammar of DynGenPar. To verify proofs in mathematical text we transform the parsed axioms and proofsteps into [TPTP](https://www.tptp.org/) and use the automatic theorem prover [Vampire](https://github.com/vprover/vampire) for verification.
 
 ## Prerequisites:
@@ -9,25 +9,25 @@ You need Julia, Cmake 3.15 or higher, Qt 5, wget and the g++ compiler, version 1
 ## How to use OConcise:
 
 ### Installation:
-1. In the main directory run the setup with Julia (the installation path must be saved into the system variable PATH):
-`julia setup.jl`
-The setup installs yaml-cpp, a  Yaml parser and emitter in C++, the parser DynGenPar and the theorem prover Vampire.
-The yaml-cpp licence can be found here: [https://github.com/jbeder/yaml-cpp/blob/master/LICENSE](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE).
-The Vampire licence can be found here: [https://github.com/vprover/vampire/blob/master/LICENCE](https://github.com/vprover/vampire/blob/master/LICENCE).
+1. In the main directory run the setup with Julia (the installation path must be saved into the system variable PATH):  
+`julia setup.jl`  
+The setup installs yaml-cpp, a  Yaml parser and emitter in C++, the parser DynGenPar and the theorem prover Vampire.  
+The yaml-cpp licence can be found here: [https://github.com/jbeder/yaml-cpp/blob/master/LICENSE](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE).  
+The Vampire licence can be found here: [https://github.com/vprover/vampire/blob/master/LICENCE](https://github.com/vprover/vampire/blob/master/LICENCE).  
 2. To test the installation run the test file:
-`julia test/main.jl`
-The output should be a data frame containing axioms and proof steps and the answer of the theorem prover Vampire for the checked proof step.
+`julia test/main.jl`  
+The output should be a data frame containing axioms and proof steps and the answer of the theorem prover Vampire for the checked proof step.  
 
 ### Where you find what you need:
-The type sheets are stored in the **yamlFiles** directory.
-A test file can be found in the **test** directory.
+The type sheets are stored in the **yamlFiles** directory.  
+A test file can be found in the **test** directory.  
 
 ### Type sheets:
 The grammar of the YAML type sheets is very similar to the original .cnt grammar:
 
-**Tokens**: characters
-**Start category**: TypeSheet
-**Productions**:
+**Tokens**: characters  
+**Start category**: TypeSheet  
+**Productions**:  
 ```
 ##hchar ::= \x00 . . . \x09 | \x0B . . . \x0C | \x0E . . . \xFFFF
 ##char ::= ##hchar | \n
