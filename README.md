@@ -19,12 +19,8 @@ The Vampire licence can be found here: [https://github.com/vprover/vampire/blob/
 The output should be a data frame containing axioms and proof steps and the answer of the theorem prover Vampire for the checked proof step.  
 
 ### Where you find what you need:
-The type sheets are stored in the **yamlFiles** directory.  
-<<<<<<< HEAD
-A test file can be found in the **test** directory.  
-=======
+The type sheets are stored in the **yamlFiles** directory.
 A test file can be found in the **test** directory.
->>>>>>> 75c666ab766cb00142d739b08e7438097575ae9a
 
 ### Type sheets:
 The grammar of the YAML type sheets is very similar to the original .cnt grammar:
