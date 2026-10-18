@@ -22,10 +22,7 @@
 using DataFrames
 
 function checkStatements()
-    vampirePath = ENV["OCONCISE"] * "/vampire"    
-    if isempty(stmtList)
-        throw(error("the statement list is empty!"))
-    end
+    vampirePath = ENV["OCONCISE"] * "/vampire"
     if !isfile(vampirePath * "/vampire")
         throw(error("vampire is not installed!"))
     end

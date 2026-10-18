@@ -806,7 +806,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                             {
                                 
                                 Rule ruleTab;
-                                if(typeid(Cat) == typeid(int))
+                                if (typeid(Cat) == typeid(int))
                                 {
                                     ruleTab << (Cat) categoryNames.indexOf(catName+suffix);
                                     for (auto el: thisProd)
@@ -931,7 +931,7 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                                     }
                                     rules[catNameTaboo] << ruleTab;
                                 } 
-                            }                               
+                            }                              
                         }
                     }
                 }

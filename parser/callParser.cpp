@@ -33,7 +33,7 @@ std::vector<std::string> callParser(const std::string &sourceFile,const std::str
     QList<StackItem> stacks;
     QList<Match> matches = parser.parse(&errorPos, &errorToken, 0,&stacks, 0);
     int i = 0;
-    std::cout << "parsed sucessfully: " << (matches.size() > 0) << "\n";
+    std::cout << "parsed successfully: " << (matches.size() > 0) << "\n";
     std::vector<std::string> vec = {};
     for (auto m:matches)
     {

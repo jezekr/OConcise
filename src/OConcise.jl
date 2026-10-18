@@ -140,9 +140,6 @@ function checkProofs(data::OrderedDict,formats::Vector{Any},tptpTarget::String,n
     if isempty(tptpTarget)
         throw(ArgumentError("tptpTarget is empty!"))
     end
-    if isempty(nodeFunction)
-        throw(ArgumentError("nodeFunction is empty!"))
-    end
     global stmtList = DataFrame(tptpType = "",name=[],arguments=[],tptp="",output=[])
     traverseTree(data,formats,tptpTarget,nodeFunction)
     checkStatements()

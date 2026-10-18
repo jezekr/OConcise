@@ -96,9 +96,17 @@ QStringList OConciseParser::printParseTreeToJson(Node node)
                     }
                     result << "\"node" << QString::number(nodeNr) << "\": {\n";
                     result << "  \"Type\": \"String\"" << ",\n";
-                    if (node.data == "\n")
+                    if (node.data.toString() == "\\")
+                    {
+                        result << "  \"content\": \"" << "\\" << node.data.toString() << "\"\n";
+                    }
+                    else if (node.data.toString() == "\n")
                     {
                         result << "  \"content\": \"" << "\\n" << "\"\n";
+                    }
+                    else if (node.data.toString() == "\t")
+                    {
+                        result << "  \"content\": \"" << "\\t" << "\"\n";
                     }
                     else
                     {
