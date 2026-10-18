@@ -29,7 +29,7 @@ Cat CharacterTokenSource::readToken()
     {
         inputTokens << qMakePair(cat,tokenString);
         tree = Node(cat);
-        tree.data = tokenString.trimmed();
+        tree.data = tokenString;
         return cat;
     }
     return Cat();

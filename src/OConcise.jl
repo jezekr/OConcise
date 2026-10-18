@@ -81,15 +81,27 @@ DotEnv.load!()
 
 @wrapmodule(() -> joinpath(ENV["OCONCISE"],"shared/callParser.so"))
 
-export printCntToYaml, parseFileToJson, readJsonStringIn, readJsonFileIn, readTypesheetsIn, checkProofs, stmtList
+export traverseTree, parseFileToJson, readJsonStringIn, readJsonFileIn, readTypesheetsIn, checkProofs, stmtList
 
 function parseFileToJson(fileToParse::String,typeSheet::String,target::String)
+    if !isfile(fileToParse)
+        throw(ArgumentError("file " * fileToParse * " does not exist!"))
+    end
+    if !isfile(typeSheet)
+        throw(ArgumentError("file " * typeSheet * " does not exist!"))
+    end
+    if isempty(target)
+        throw(ArgumentError("target is empty!"))
+    end
     println("parse")
     matches = callParser(fileToParse,typeSheet,target)
     return matches
 end
 
 function readJsonFileIn(filePath::String)
+    if !isfile(fileToPath)
+        throw(ArgumentError("file " * filePath * " does not exist!"))
+    end
     data = JSON.parsefile(filePath, dicttype=OrderedDict)
     return data
 end
@@ -104,8 +116,14 @@ function readJsonStringIn(json::CxxWrap.StdLib.StdStringDereferenced)
 end
 
 function readTypesheetsIn(typesheets::Array{String})
+    if isempty(typesheets)
+        throw(ArgumentError("typesheets is empty!"))
+    end
     formats = []
     for typesheet in typesheets
+        if !isfile(typesheet)
+            throw(ArgumentError("file " * typesheet * " does not exist!"))
+        end
         format = YAML.load_file(typesheet; dicttype=OrderedDict{String,Any})
         push!(formats,format)
     end
@@ -113,6 +131,18 @@ function readTypesheetsIn(typesheets::Array{String})
 end
 
 function checkProofs(data::OrderedDict,formats::Vector{Any},tptpTarget::String,nodeFunction::Function)
+    if isempty(data)
+        throw(ArgumentError("data is empty!"))
+    end
+    if isempty(formats)
+        throw(ArgumentError("formats is empty!"))
+    end
+    if isempty(tptpTarget)
+        throw(ArgumentError("tptpTarget is empty!"))
+    end
+    if isempty(nodeFunction)
+        throw(ArgumentError("nodeFunction is empty!"))
+    end
     global stmtList = DataFrame(tptpType = "",name=[],arguments=[],tptp="",output=[])
     traverseTree(data,formats,tptpTarget,nodeFunction)
     checkStatements()

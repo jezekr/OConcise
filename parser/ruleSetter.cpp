@@ -301,7 +301,7 @@ void RuleSetter::setRules()
 Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::Node prods)
 {   
     QString fullName;
-    QString matchChar;
+    QString matchLink;
     int tabooNr = 0;
     int exceptNr = 0;
     int expectNr = 0;
@@ -416,43 +416,46 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                     QString cat;
                     YAML::Node specVals = specs["UnionSpec"];
                     assert(specVals.IsSequence());
-                    for (YAML::const_iterator entryit {specVals.begin()}; entryit != specVals.end(); ++entryit)
+                    if ((*specVals.begin()).IsMap())
                     {
-                        if ((*entryit).IsMap())
+                        optNr += 1;
+                        QString newCatName = catName + "options" + QString::number(optNr);
+                        categoryNames << (newCatName);
+                        if(typeid(Cat) == typeid(int))
                         {
-                            QString catAlias = entryit->begin()->first.as<QString>();
-                            cat = (entryit->begin()->second).as<QString>();
-                            if (((*iter)["CatVar"]).as<QString>() == catAlias)
-                            {
-                                if (categoryNames.contains(cat))
-                                {
-                                    if(typeid(Cat) == typeid(int))
-                                    {
-                                        rules[category] << (Rule() << (Cat) categoryNames.indexOf(cat));
-                                    }
-                                    else
-                                    {
-                                        rules[category] << (Rule() << (Cat) cat);
-                                    }
-                                }
-                            }
+                            rule << (Cat) categoryNames.indexOf(newCatName);
                         }
                         else
                         {
-                            QString cat = (*entryit).second.as<QString>();
-                            if (!categoryNames.contains(cat))
-                            {
-                                qFatal(cat.toLatin1() + " is not in the Catlist\n");
-                            }
-                            if(typeid(Cat) == typeid(int))
-                            {
-                                rule << (Cat) categoryNames.indexOf(cat);
-                            }
-                            else
-                            {
-                                rule << (Cat) cat;
+                            rule << (Cat) (newCatName);
+                        }
+                        YAML::Node newProds;
+                        for (YAML::const_iterator entryit {specVals.begin()}; entryit != specVals.end(); ++entryit)
+                        { 
+                            QString catAlias = entryit->begin()->first.as<QString>();
+                            cat = (entryit->begin()->second).as<QString>();
+                            if (((*iter)["CatVar"]).as<QString>() == catAlias)
+                            {     
+                                if (entryit == specVals.begin())
+                                {                           
+                                    YAML::Node added;
+                                    YAML::Node catVar;
+                                    catVar["CatVar"] = cat;
+                                    added["alternative"].push_back(catVar);
+                                    newProds.push_back(added);
+                                }
+                                else
+                                {
+                                    YAML::Node added;
+                                    YAML::Node catVar;
+                                    catVar["CatVar"] = cat;
+                                    added["or"].push_back(catVar);
+                                    newProds.push_back(added);
+                                }
                             }
                         }
+                        Rule r;
+                        getRule(r,newCatName,suffix,newProds);
                     }
                 }
                 assert(specs.IsMap());
@@ -535,14 +538,11 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
             {
                 if (!(*itNext).IsScalar() && (*itNext)["match"])
                 {
-                    matchChar = (*iter)["link"].as<QString>();
+                    matchLink = (*iter)["link"].as<QString>();
                     YAML::Node newProd = (*itNext)["match"];
                     for  (YAML::const_iterator elemit {newProd.begin()}; elemit != newProd.end(); ++elemit)
                     {
-                        if (!(*elemit).IsScalar() && (*elemit)["Maximal"])
-                        {
-                        }
-                        else if (!(*elemit).IsScalar() && (*elemit)["Expect"])
+                        if (!(*elemit).IsScalar() && (*elemit)["Expect"])
                         {
                             expectNr += 1;
                             QString suffix = "Expect" + QString::number(expectNr);
@@ -559,14 +559,14 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                             Rule ruleExp;
                             if(typeid(Cat) == typeid(int))
                             {
-                                ruleExp << (Cat) categoryNames.indexOf(matchChar);
+                                ruleExp << (Cat) categoryNames.indexOf(matchLink);
                                 ruleExp.nextTokenConstraints.expect << (Cat) categoryNames.indexOf(catNameCharExpect);
                                 rules[catNameExpect] << ruleExp;
                                 rule << (Cat) categoryNames.indexOf(catNameExpect);
                             }
                             else
                             {
-                                ruleExp << (Cat) matchChar;
+                                ruleExp << (Cat) matchLink;
                                 ruleExp.nextTokenConstraints.expect << (Cat) catNameCharExpect;
                                 rules[catNameExpect] << ruleExp;
                                 rule << (Cat) catNameExpect;
@@ -589,14 +589,14 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                             Rule ruleTab;
                             if(typeid(Cat) == typeid(int))
                             {
-                                ruleTab << (Cat) categoryNames.indexOf(matchChar);
+                                ruleTab << (Cat) categoryNames.indexOf(matchLink);
                                 ruleTab.nextTokenConstraints.taboo << (Cat) categoryNames.indexOf(catNameCharTaboo);
                                 rules[catNameTaboo] << ruleTab;
                                 rule << (Cat) categoryNames.indexOf(catNameTaboo);
                             }
                             else
                             {
-                                ruleTab << (Cat) matchChar;
+                                ruleTab << (Cat) matchLink;
                                 ruleTab.nextTokenConstraints.taboo << (Cat) catNameCharTaboo;
                                 rules[catNameTaboo] << ruleTab;
                                 rule << (Cat) catNameTaboo;
@@ -604,33 +604,75 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
                         }
                         else if (!(*elemit).IsScalar() && (*elemit)["Except"])
                         {
+                            assert((*elemit)["Except"].IsSequence());
                             exceptNr += 1;
-                            QString suffix = "Except" + QString::number(exceptNr);
-                            QString catNameExcept = catName + suffix;
-                            categoryNames << catNameExcept;
-                            QString suffix2 = "Except" + QString::number(exceptNr) + "_taboo";
-                            QString catNameCharExcept = catName + suffix2;
-                            categoryNames << catNameCharExcept;
-                            Rule r;
-                            if (!rules.contains(catNameCharExcept))
-                            {
-                                rules[catNameCharExcept] << getRule(r,catName,suffix2,(*elemit)["Except"]);
-                            }
-                            Rule ruleTab;
+                            QString suffix = "Includes" + QString::number(exceptNr);
+                            QString catNameIncludes = catName + suffix;
+                            categoryNames << catNameIncludes;
                             if(typeid(Cat) == typeid(int))
                             {
-                                ruleTab << (Cat) categoryNames.indexOf(matchChar);
-                                ruleTab.nextTokenConstraints.taboo << (Cat) categoryNames.indexOf(catNameCharExcept);
-                                rules[catNameExcept] << ruleTab;
-                                rule << (Cat) categoryNames.indexOf(catNameExcept);
+                                rule << (Cat) categoryNames.indexOf(catNameIncludes);
                             }
                             else
                             {
-                                ruleTab << (Cat) matchChar;
-                                ruleTab.nextTokenConstraints.taboo << (Cat) catNameCharExcept;
-                                rules[catNameExcept] << ruleTab;
-                                rule << (Cat) catNameExcept;
+                                rule << (Cat) catNameIncludes;
                             }
+                            if (rules.contains(matchLink))
+                            {
+                                for (Rule r: rules[matchLink])
+                                {
+                                    for (auto el: r)
+                                    {      
+                                        if ((*elemit)["Except"][0].IsScalar())
+                                        {
+                                            if (el != (*elemit)["Except"][0].as<QString>())
+                                            {
+                                                if(typeid(Cat) == typeid(int))
+                                                {
+                                                    rules[catNameIncludes] << (Rule() << (Cat) categoryNames.indexOf(el));
+                                                }
+                                                else
+                                                {
+                                                    rules[catNameIncludes] << (Rule() << (Cat) el);
+                                                }
+                                            }
+                                        }
+                                        else if ((*elemit)["Except"][0]["once"])
+                                        {
+                                            YAML::Node newNode = (*elemit)["Except"][0]["once"];
+                                            bool isExcepted = false;
+                                            for (YAML::const_iterator altit {newNode.begin()}; altit != newNode.end(); ++altit)
+                                            {
+                                                if ((*altit)["alternative"])
+                                                {
+                                                    if (el == (*altit)["alternative"][0].as<QString>())
+                                                    {
+                                                        isExcepted = true;
+                                                    }
+                                                }
+                                                else if ((*altit)["or"])
+                                                {
+                                                    if (el == (*altit)["or"][0].as<QString>())
+                                                    {
+                                                        isExcepted = true;
+                                                    }
+                                                }
+                                            }
+                                            if (!isExcepted)
+                                            {
+                                                if (typeid(Cat) == typeid(int))
+                                                {
+                                                    rules[catNameIncludes] << (Rule() << (Cat) categoryNames.indexOf(el));
+                                                }
+                                                else
+                                                {
+                                                    rules[catNameIncludes] << (Rule() << (Cat) el);
+                                                }
+                                            }                                                 
+                                        }
+                                    }
+                                }
+                            }                                            
                         }
                     }
                 }
@@ -705,16 +747,22 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
             optNr += 1;
             suffix = "multiple" + QString::number(optNr);
             categoryNames << (catName+suffix);
+            tabooNr += 1;
+            QString suffix2 = "Taboo" + QString::number(tabooNr);
+            QString catNameTaboo = catName + suffix2;
+            categoryNames << catNameTaboo;
             if(typeid(Cat) == typeid(int))
             {
-                rule << (Cat) categoryNames.indexOf(catName+suffix);
+                rule << (Cat) categoryNames.indexOf(catNameTaboo);
             }
             else
             {
-                rule << (Cat) (catName+suffix);
+                rule << (Cat) (catNameTaboo);
             }
             YAML::Node thisProd;
             thisProd = (*iter)["multiple"];
+            YAML::const_iterator itNext = iter;
+            ++itNext;
             Rule rule;
             YAML::Node newProds;
             YAML::Node added1;
@@ -745,20 +793,76 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
             newProds.push_back(added1);
             newProds.push_back(added2);
             getRule(rule,catName,suffix,newProds);
+            if (itNext != prods.end())
+            {
+                if (!(*itNext).IsScalar() && (*itNext)["match"])
+                {
+                    YAML::Node newProd = (*itNext)["match"];
+                    for  (YAML::const_iterator elemit {newProd.begin()}; elemit != newProd.end(); ++elemit)
+                    {
+                        if (!(*elemit).IsScalar() && (*elemit)["Maximal"])
+                        {   
+                            if ((*elemit)["Maximal"][0].as<QString>() == "&+")
+                            {
+                                
+                                Rule ruleTab;
+                                if(typeid(Cat) == typeid(int))
+                                {
+                                    ruleTab << (Cat) categoryNames.indexOf(catName+suffix);
+                                    for (auto el: thisProd)
+                                    {
+                                        if (el["alternative"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) categoryNames.indexOf((el["alternative"][0]["link"]).as<QString>()));
+                                        }
+                                        else if (el["or"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) categoryNames.indexOf((el["or"][0]["link"]).as<QString>()));
+                                        }
+                                    }
+                                    rules[catNameTaboo] << ruleTab;
+                                }
+                                else
+                                {
+                                    ruleTab << (Cat) (catName+suffix);
+                                    for (auto el: thisProd)
+                                    {
+                                        if (el["alternative"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) ((el["alternative"][0]["link"]).as<QString>()));
+                                        }
+                                        else if (el["or"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) ((el["or"][0]["link"]).as<QString>()));
+                                        }
+                                    }
+                                    rules[catNameTaboo] << ruleTab;
+                                }
+                            }                               
+                        }
+                    }
+                }
+            }
         }
         else if (!(*iter).IsScalar() && (*iter)["anyTimes"])
         {
             optNr += 1;
             suffix = "anyTimes" + QString::number(optNr);
             categoryNames << (catName+suffix);
+            tabooNr += 1;
+            QString suffix2 = "Taboo" + QString::number(tabooNr);
+            QString catNameTaboo = catName + suffix2;
+            categoryNames << catNameTaboo;
             if(typeid(Cat) == typeid(int))
             {
-                rule << (Cat) categoryNames.indexOf(catName+suffix);
+                rule << (Cat) categoryNames.indexOf(catNameTaboo);
             }
             else
             {
-                rule << (Cat) (catName+suffix);
+                rule << (Cat) (catNameTaboo);
             }
+            YAML::const_iterator itNext = iter;
+            ++itNext;
             YAML::Node thisProd;
             thisProd = (*iter)["anyTimes"];
             Rule rule;
@@ -783,6 +887,55 @@ Rule RuleSetter::getRule(Rule &rule,const QString &catName,QString suffix,YAML::
             newProds.push_back(added1);
             newProds.push_back(added2);
             getRule(rule,catName,suffix,newProds);
+            if (itNext != prods.end())
+            {
+                if (!(*itNext).IsScalar() && (*itNext)["match"])
+                {
+                    YAML::Node newProd = (*itNext)["match"];
+                    for  (YAML::const_iterator elemit {newProd.begin()}; elemit != newProd.end(); ++elemit)
+                    {
+                        if (!(*elemit).IsScalar() && (*elemit)["Maximal"])
+                        {
+                            if ((*elemit)["Maximal"][0].as<QString>() == "&+")
+                            {
+                                Rule ruleTab;
+                                if(typeid(Cat) == typeid(int))
+                                {
+                                    ruleTab << (Cat) categoryNames.indexOf(catName+suffix);
+                                    for (auto el: thisProd)
+                                    {
+                                        if (el["alternative"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) categoryNames.indexOf((el["alternative"][0]["link"]).as<QString>()));
+                                        }
+                                        if (el["or"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) categoryNames.indexOf((el["or"][0]["link"]).as<QString>()));
+                                        }
+                                    }
+                                    rules[catNameTaboo] << ruleTab;
+                                }
+                                else
+                                {
+                                    ruleTab << (Cat) (catName+suffix);
+                                    for (auto el: thisProd)
+                                    {
+                                        if (el["alternative"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) ((el["alternative"][0]["link"]).as<QString>()));
+                                        }
+                                        if (el["or"])
+                                        {
+                                            ruleTab.nextTokenConstraints.taboo.append((Cat) ((el["or"][0]["link"]).as<QString>()));
+                                        }
+                                    }
+                                    rules[catNameTaboo] << ruleTab;
+                                } 
+                            }                               
+                        }
+                    }
+                }
+            }
         }
         if ((*iter).IsScalar())
         {

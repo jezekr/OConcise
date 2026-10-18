@@ -32,7 +32,7 @@
 using OrderedCollections
 
 include("getProduction.jl")
-include("findType.jl")
+include("findTyped.jl")
 include("getCatOutput.jl")
 include("fillULKStatementList.jl")
 
@@ -40,7 +40,7 @@ function executeNodeFunction(nodeFunction::Function, data::OrderedDict, peekNode
     return nodeFunction(data,peekNode,transferContent)
 end
 
-function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,nodeFunction::Function)
+function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,nodeFunction=nothing)
     a = keys(data)
     keyVec = collect(a)
     node = keyVec[1]
@@ -96,7 +96,7 @@ function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,node
                 else
                     # get the information of the category of the node from the typesheet
                     if haskey(data[peekNode],"children")
-                        if !(contains(data[peekNode]["Type"],"anyTimes") ||  contains(data[peekNode]["Type"],"multiple") || contains(data[peekNode]["Type"],"once") || contains(data[peekNode]["Type"],"opt"))
+                        if !(contains(data[peekNode]["Type"],"anyTimes") ||  contains(data[peekNode]["Type"],"multiple") || contains(data[peekNode]["Type"],"once") || contains(data[peekNode]["Type"],"opt") || contains(data[peekNode]["Type"],"Taboo") || contains(data[peekNode]["Type"],"Expect"))
                             production = getProduction(formats,data[peekNode]["Type"],target)
                             if !isempty(production)
                                 transferContent[peekNode] = OrderedDict()
@@ -127,7 +127,7 @@ function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,node
                         transferContent[peekNode]["alternatives"] = OrderedDict()
                         first = true
                         for alternative in peekChildrenNames
-                            typed = findType(data,alternative,[])
+                            typed = findTyped(data,alternative,[])
                             if first
                                 if !(alternative in typed)
                                     transferContent[alternative] = OrderedDict()
@@ -167,4 +167,5 @@ function traverseTree(data::OrderedDict,formats::Vector{Any},target::String,node
             end
         end
     end #while
+    return transferContent
 end #function
