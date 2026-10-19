@@ -94,7 +94,7 @@ end
 if !isfile("$oconcisePath/shared/callParser.so")
   #create shared file callParser.so, you must install qt and save the directory in the system variable QTPATH (e.g. /usr/include/x86_64-linux-gnu/qt5)
   QTPATH = ENV["QTPATH"]
-  run(`g++ -std=c++20 -shared -fPIC parser/dyngenpar.cpp parser/characterTokenSource.cpp parser/ruleSetter.cpp parser/oconciseParser.cpp parser/callParser.cpp -I/yaml-cpp/include -Lyaml-cpp/build -lyaml-cpp -lQt5Core -I$QTPATH/QtCore -I$QTPATH -I$jllPath/override/libcxxwrap-julia/include -I$juliaPrefix/include/julia -o ./shared/callParser.so`)
+  run(`g++ -std=c++20 -shared -fPIC parser/dyngenpar.cpp parser/characterTokenSource.cpp parser/ruleSetter.cpp parser/oconciseParser.cpp parser/callParser.cpp -Iyaml-cpp/include -Lyaml-cpp/build -lyaml-cpp -lQt5Core -I$QTPATH/QtCore -I$QTPATH -I$jllPath/override/libcxxwrap-julia/include -I$juliaPrefix/include/julia -o ./shared/callParser.so`)
 end
 
 if !isfile("$oconcisePath/vampire/vampire")
